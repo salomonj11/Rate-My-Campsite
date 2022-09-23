@@ -6,6 +6,7 @@ const Campground = require('./models/campground');
 const morgan = require('morgan');
 const ejsMate = require('ejs-mate');
 const catchAsync = require('./utils/catchAsync');
+const ExpressError = require('./utils/ExpressError');
 
 mongoose.connect('mongodb://localhost:27017/rate-my-campsite', {
   useNewUrlParser: true,
@@ -47,6 +48,8 @@ app.get('/campgrounds/new', (req, res) => {
 app.post(
   '/campgrounds',
   catchAsync(async (req, res, next) => {
+    if (!req.body.campground)
+      throw new ExpressError('Invalid Campground Data', 400);
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`);
@@ -89,8 +92,14 @@ app.delete(
   })
 );
 
+app.all('*', (req, res, next) => {
+  next(new ExpressError('Page Not Found', 404));
+});
+
 app.use((err, req, res, next) => {
-  res.send('OOPS SOMETHING WENT WRONG');
+  const { statusCode = 500 } = err;
+  if (!err.message) err.message = 'Oh No, Something Went Wrong!';
+  res.status(statusCode).render('error', { err });
 });
 
 app.listen(3000, () => {
