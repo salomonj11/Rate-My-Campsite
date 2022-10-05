@@ -1,5 +1,6 @@
 <% layout('layouts/boilerplate')%>
     <link rel="stylesheet" href="/stylesheets/stars.css">
+    <link rel="stylesheet" href="/stylesheets/carousel.css">
 
     <div class="row">
         <div class="col-6">
@@ -15,11 +16,11 @@
                 <% if(campground.images.length> 1) {%>
                     <a class="carousel-control-prev" href="#campgroundCarousel" role="button" data-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
+                        <span class="sr-only"></span>
                     </a>
                     <a class="carousel-control-next" href="#campgroundCarousel" role="button" data-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
+                        <span class="sr-only"></span>
                     </a>
                     <% } %>
             </div>
