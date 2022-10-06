@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Review = require('./review');
 const Schema = mongoose.Schema;
+const cloudinary = require('cloudinary').v2;
 
 const ImageSchema = new Schema({
   url: String,
@@ -14,6 +15,17 @@ ImageSchema.virtual('thumbnail').get(function () {
 const CampgroundSchema = new Schema({
   title: String,
   images: [ImageSchema],
+  geometry: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  },
   price: Number,
   description: String,
   location: String,
@@ -38,5 +50,21 @@ CampgroundSchema.post('findOneAndDelete', async function (doc) {
     });
   }
 });
+
+CampgroundSchema.post(
+  'findOneAndDelete',
+  async function (campground) {
+    if (campground.reviews) {
+      await Review.deleteMany({
+        _id: { $in: campground.reviews },
+      });
+    }
+    if (campground.images) {
+      for (const img of campground.images) {
+        await cloudinary.uploader.destroy(img.filename);
+      }
+    }
+  }
+);
 
 module.exports = mongoose.model('Campground', CampgroundSchema);
