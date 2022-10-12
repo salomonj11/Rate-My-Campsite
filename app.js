@@ -19,8 +19,12 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
+const MongoStore = require('connect-mongo');
+const dbUrl =
+  process.env.DB_URL || 'mongodb://localhost:27017/rate-my-campsite';
+// 'mongodb://localhost:27017/rate-my-campsite'
 
-mongoose.connect('mongodb://localhost:27017/rate-my-campsite', {
+mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -43,8 +47,23 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
 
+const secret = process.env.SECRET || 'squirrel';
+
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  touchAfter: 24 * 60 * 60,
+  crypto: {
+    secret,
+  },
+});
+
+store.on('error', function (e) {
+  console.log('STORE ERROR', e);
+});
+
 const sessionConfig = {
-  secret: 'thisisasecret',
+  store,
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
