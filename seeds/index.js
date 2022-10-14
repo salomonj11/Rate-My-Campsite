@@ -3,10 +3,13 @@ const Campground = require('../models/campground');
 const cities = require('./cities');
 const { descriptors, places } = require('./seedHelper');
 
-mongoose.connect('mongodb://localhost:27017/rate-my-campsite', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(
+  'mongodb+srv://our-first-user:0c0eEqVoamEU9ING@cluster0.zmsuubz.mongodb.net/?retryWrites=true&w=majority',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -19,11 +22,11 @@ const sample = (array) =>
 
 const seedDB = async () => {
   await Campground.deleteMany({});
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 12; i++) {
     const random1000 = Math.floor(Math.random() * 1000);
     const price = Math.floor(Math.random() * 20) + 10;
     const camp = new Campground({
-      author: '633b5f3934833d702ee9d19d',
+      author: '634707aa36fe270cb7b576db',
       location: `${cities[random1000].city}, ${cities[random1000].state}`,
       title: `${sample(descriptors)} ${sample(places)}`,
       description:
